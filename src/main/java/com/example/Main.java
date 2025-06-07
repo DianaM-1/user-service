@@ -6,8 +6,6 @@ import com.example.entity.User;
 import com.example.util.HibernateUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 

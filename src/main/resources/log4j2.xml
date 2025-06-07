@@ -1,18 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
-        <File name="File" fileName="logs/user-service.log">
+        <File name="File" fileName="logs/errors.log">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
     </Appenders>
+
     <Loggers>
+        <Logger name="org.hibernate.SQL" level="debug" additivity="false">
+            <AppenderRef ref="File"/>
+        </Logger>
+
+        <Logger name="com.example.dao" level="debug">
+            <AppenderRef ref="File"/>
+        </Logger>
+
         <Root level="info">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="File"/>
         </Root>
-        <Logger name="org.hibernate" level="warn"/>
     </Loggers>
 </Configuration>
