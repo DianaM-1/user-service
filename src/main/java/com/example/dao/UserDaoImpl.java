@@ -6,43 +6,50 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 public class UserDaoImpl implements UserDao {
     private static final Logger logger = LoggerFactory.getLogger(UserDaoImpl.class);
 
+    protected Session getSession() {
+        return HibernateUtil.getSessionFactory().openSession();
+    }
+
     @Override
     public void save(User user) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = getSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
+            if (transaction == null) {
+                throw new RuntimeException("Failed to start transaction");
+            }
             session.save(user);
             transaction.commit();
-            logger.info("User saved successfully: {}", user);
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             logger.error("Error saving user: {}", user, e);
+            throw new RuntimeException(e);
         } finally {
             session.close();
         }
     }
-
     @Override
     public User findById(Long id) {
+        if (id == null) {
+            logger.error("Attempted to find user with null ID");
+            throw new IllegalArgumentException("ID cannot be null");
+        }
+
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             User user = session.get(User.class, id);
             if (user == null) {
-                logger.warn("User not found with ID: {}", id);
-            } else {
-                logger.debug("User found: {}", user);
+                logger.warn("User not found with id: {}", id);
             }
             return user;
-        } catch (Exception e) {
-            logger.error("Error finding user by ID: {}", id, e);
-            return null;
         }
     }
 
@@ -54,7 +61,7 @@ public class UserDaoImpl implements UserDao {
             return users;
         } catch (Exception e) {
             logger.error("Error fetching all users", e);
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -71,6 +78,7 @@ public class UserDaoImpl implements UserDao {
                 transaction.rollback();
             }
             logger.error("Error updating user: {}", user, e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -87,6 +95,7 @@ public class UserDaoImpl implements UserDao {
                 transaction.rollback();
             }
             logger.error("Error deleting user: {}", user, e);
+            throw new RuntimeException(e);
         }
     }
 }

@@ -43,6 +43,8 @@ class UserServiceUnitTest {
 
         assertNotNull(created);
         assertEquals("Test User", created.getName());
+        assertEquals("test@example.com", created.getEmail());
+        assertEquals(30, created.getAge());
         verify(userDao, times(1)).save(any(User.class));
     }
 
@@ -55,6 +57,16 @@ class UserServiceUnitTest {
         assertNotNull(found);
         assertEquals(1L, found.getId());
         verify(userDao, times(1)).findById(1L);
+    }
+
+    @Test
+    void getUserById_WithNonExistentId_ShouldReturnNull() {
+        when(userDao.findById(999L)).thenReturn(null);
+
+        User found = userService.getUserById(999L);
+
+        assertNull(found);
+        verify(userDao, times(1)).findById(999L);
     }
 
     @Test
@@ -78,11 +90,62 @@ class UserServiceUnitTest {
     }
 
     @Test
+    void updateUser_WithNonExistentId_ShouldDoNothing() {
+        when(userDao.findById(999L)).thenReturn(null);
+
+        userService.updateUser(999L, "Updated Name", "updated@example.com", 35);
+
+        verify(userDao, never()).update(any(User.class));
+    }
+
+    @Test
     void deleteUser_ShouldDeleteExistingUser() {
         when(userDao.findById(1L)).thenReturn(testUser);
 
         userService.deleteUser(1L);
 
         verify(userDao, times(1)).delete(any(User.class));
+    }
+
+    @Test
+    void deleteUser_WithNonExistentId_ShouldDoNothing() {
+        when(userDao.findById(999L)).thenReturn(null);
+
+        userService.deleteUser(999L);
+
+        verify(userDao, never()).delete(any(User.class));
+    }
+
+    @Test
+    void updateUser_UpdateOnlyName_ShouldSucceed() {
+        when(userDao.findById(1L)).thenReturn(testUser);
+
+        userService.updateUser(1L, "New Name", null, null);
+
+        assertEquals("New Name", testUser.getName());
+        assertEquals("test@example.com", testUser.getEmail());
+        assertEquals(30, testUser.getAge());
+    }
+
+    @Test
+    void updateUser_UpdateOnlyEmail_ShouldSucceed() {
+        when(userDao.findById(1L)).thenReturn(testUser);
+
+        userService.updateUser(1L, null, "new@example.com", null);
+
+        assertEquals("Test User", testUser.getName());
+        assertEquals("new@example.com", testUser.getEmail());
+        assertEquals(30, testUser.getAge());
+    }
+
+    @Test
+    void updateUser_UpdateOnlyAge_ShouldSucceed() {
+        when(userDao.findById(1L)).thenReturn(testUser);
+
+        userService.updateUser(1L, null, null, 35);
+
+        assertEquals("Test User", testUser.getName());
+        assertEquals("test@example.com", testUser.getEmail());
+        assertEquals(35, testUser.getAge());
     }
 }

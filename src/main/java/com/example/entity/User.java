@@ -2,6 +2,7 @@ package com.example.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import javax.validation.constraints.*;
 
 @Entity
 @Table(name = "users")
@@ -10,19 +11,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @NotNull(message = "Name cannot be blank")
+    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+    @Column(nullable = false)
     private String name;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @NotNull(message = "Email cannot be blank")
+    @Email(message = "Email should be valid")
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "age")
+    @Min(value = 0, message = "Age should not be less than 0")
+    @Max(value = 150, message = "Age should not be greater than 150")
+    @Column(nullable = false)
     private Integer age;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    // Constructors
     public User() {
     }
 
@@ -33,7 +39,6 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
