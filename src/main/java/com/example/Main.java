@@ -6,6 +6,7 @@ import com.example.entity.User;
 import com.example.util.HibernateUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -20,30 +21,35 @@ public class Main {
 
             boolean running = true;
             while (running) {
-                printMenu();
-                int choice = getIntInput("Enter your choice: ");
+                try {
 
-                switch (choice) {
-                    case 1:
-                        createUser();
-                        break;
-                    case 2:
-                        getUserById();
-                        break;
-                    case 3:
-                        getAllUsers();
-                        break;
-                    case 4:
-                        updateUser();
-                        break;
-                    case 5:
-                        deleteUser();
-                        break;
-                    case 6:
-                        running = false;
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please try again.");
+                    printMenu();
+                    int choice = getIntInput("Enter your choice: ");
+
+                    switch (choice) {
+                        case 1:
+                            createUser();
+                            break;
+                        case 2:
+                            getUserById();
+                            break;
+                        case 3:
+                            getAllUsers();
+                            break;
+                        case 4:
+                            updateUser();
+                            break;
+                        case 5:
+                            deleteUser();
+                            break;
+                        case 6:
+                            running = false;
+                            break;
+                        default:
+                            System.out.println("Invalid choice. Please try again.");
+                    }
+                } catch (Exception e) {
+                    logger.error("An error occurred during operation: ", e);
                 }
             }
         } catch (Exception e) {
